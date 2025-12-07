@@ -13,20 +13,37 @@ const aspectRatio = document.getElementById('aspectRatio');
 const generateBtn = document.getElementById('generateBtn');
 const resultSection = document.getElementById('resultSection');
 const resultImage = document.getElementById('resultImage');
+const resultContainer = document.getElementById('resultContainer');
 const downloadBtn = document.getElementById('downloadBtn');
+const shareBtn = document.getElementById('shareBtn');
 const newGenerationBtn = document.getElementById('newGenerationBtn');
 const errorMessage = document.getElementById('errorMessage');
 const errorText = document.getElementById('errorText');
+const currentYear = document.getElementById('currentYear');
+const fullscreenModal = document.getElementById('fullscreenModal');
+const fullscreenImage = document.getElementById('fullscreenImage');
+const fullscreenClose = document.getElementById('fullscreenClose');
+const promptsToggle = document.getElementById('promptsToggle');
+const promptsList = document.getElementById('promptsList');
 
 // State
 let uploadedFiles = [];
+let isGenerating = false;
 const MAX_FILES = 14;
 
 // Initialize
 document.addEventListener('DOMContentLoaded', () => {
+    setCurrentYear();
     checkApiHealth();
     setupEventListeners();
 });
+
+/**
+ * Set current year in footer
+ */
+function setCurrentYear() {
+    currentYear.textContent = new Date().getFullYear();
+}
 
 /**
  * Check API health status
@@ -67,11 +84,75 @@ function setupEventListeners() {
 
     // Result actions
     downloadBtn.addEventListener('click', handleDownload);
+    shareBtn.addEventListener('click', handleShare);
     newGenerationBtn.addEventListener('click', handleNewGeneration);
+
+    // Result container click for fullscreen
+    resultContainer.addEventListener('click', () => {
+        if (resultImage.src) {
+            openFullscreen(resultImage.src);
+        }
+    });
+
+    // Fullscreen modal
+    fullscreenClose.addEventListener('click', closeFullscreen);
+    fullscreenModal.addEventListener('click', (e) => {
+        if (e.target === fullscreenModal) {
+            closeFullscreen();
+        }
+    });
+
+    // Escape key to close fullscreen
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && !fullscreenModal.classList.contains('hidden')) {
+            closeFullscreen();
+        }
+    });
+
+    // Suggested prompts toggle
+    promptsToggle.addEventListener('click', togglePromptsList);
+
+    // Prompt items
+    document.querySelectorAll('.prompt-item').forEach(item => {
+        item.addEventListener('click', () => {
+            const prompt = item.dataset.prompt;
+            promptInput.value = prompt;
+            handlePromptInput();
+            promptInput.focus();
+            // Close the prompts list
+            promptsList.classList.add('hidden');
+            promptsToggle.classList.remove('active');
+        });
+    });
 
     // Prevent default drag behavior on document
     document.addEventListener('dragover', (e) => e.preventDefault());
     document.addEventListener('drop', (e) => e.preventDefault());
+}
+
+/**
+ * Toggle suggested prompts list
+ */
+function togglePromptsList() {
+    promptsList.classList.toggle('hidden');
+    promptsToggle.classList.toggle('active');
+}
+
+/**
+ * Open fullscreen modal
+ */
+function openFullscreen(imageSrc) {
+    fullscreenImage.src = imageSrc;
+    fullscreenModal.classList.remove('hidden');
+    document.body.style.overflow = 'hidden';
+}
+
+/**
+ * Close fullscreen modal
+ */
+function closeFullscreen() {
+    fullscreenModal.classList.add('hidden');
+    document.body.style.overflow = '';
 }
 
 /**
@@ -139,11 +220,12 @@ function createPreviewItem(file, index) {
     const reader = new FileReader();
 
     reader.onload = (e) => {
+        const imageSrc = e.target.result;
         const item = document.createElement('div');
         item.className = 'preview-item';
         item.dataset.index = index;
         item.innerHTML = `
-            <img src="${e.target.result}" alt="Preview ${index + 1}">
+            <img src="${imageSrc}" alt="Preview ${index + 1}">
             <button class="preview-remove" title="Remove">
                 <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <line x1="18" y1="6" x2="6" y2="18"/>
@@ -151,6 +233,13 @@ function createPreviewItem(file, index) {
                 </svg>
             </button>
         `;
+
+        // Click on image to view fullscreen
+        item.addEventListener('click', (e) => {
+            if (!e.target.closest('.preview-remove')) {
+                openFullscreen(imageSrc);
+            }
+        });
 
         item.querySelector('.preview-remove').addEventListener('click', (e) => {
             e.stopPropagation();
@@ -197,10 +286,8 @@ function handlePromptInput() {
  */
 function updateGenerateButton() {
     const hasPrompt = promptInput.value.trim().length > 0;
-    const hasImages = uploadedFiles.length > 0;
-
-    // Enable if we have a prompt (images are optional for text-to-image)
-    generateBtn.disabled = !hasPrompt;
+    // Only enable if we have a prompt AND not currently generating
+    generateBtn.disabled = !hasPrompt || isGenerating;
 }
 
 /**
@@ -214,7 +301,12 @@ async function handleGenerate() {
         return;
     }
 
-    // Disable button and show loading
+    if (isGenerating) {
+        return; // Prevent double-clicks
+    }
+
+    // Set generating state
+    isGenerating = true;
     setLoading(true);
     hideError();
     resultSection.classList.add('hidden');
@@ -258,7 +350,50 @@ async function handleGenerate() {
         console.error('Generation error:', error);
         showError(error.message || 'An error occurred while generating the image.');
     } finally {
+        // Always reset generating state
+        isGenerating = false;
         setLoading(false);
+    }
+}
+
+/**
+ * Handle share button click
+ */
+async function handleShare() {
+    const imageSrc = resultImage.src;
+
+    if (!imageSrc) return;
+
+    try {
+        // Check if Web Share API is available
+        if (navigator.share && navigator.canShare) {
+            // Convert base64 to blob for sharing
+            const response = await fetch(imageSrc);
+            const blob = await response.blob();
+            const file = new File([blob], `monkee-${Date.now()}.png`, { type: 'image/png' });
+
+            if (navigator.canShare({ files: [file] })) {
+                await navigator.share({
+                    files: [file],
+                    title: 'Monkee AI Generated Image',
+                    text: 'Check out this AI generated image!'
+                });
+                return;
+            }
+        }
+
+        // Fallback: copy image URL to clipboard (for desktop)
+        if (navigator.clipboard) {
+            // For data URLs, we'll just notify the user to download
+            showError('Share not supported on this device. Please use Download instead.');
+            setTimeout(hideError, 3000);
+        }
+    } catch (error) {
+        if (error.name !== 'AbortError') {
+            console.error('Share error:', error);
+            showError('Unable to share. Please use Download instead.');
+            setTimeout(hideError, 3000);
+        }
     }
 }
 
@@ -298,31 +433,34 @@ function handleNewGeneration() {
     // Hide any errors
     hideError();
 
+    // Reset generating state just in case
+    isGenerating = false;
+
     // Update button state
     updateGenerateButton();
 
     // Scroll to top
     window.scrollTo({ top: 0, behavior: 'smooth' });
 
-    // Focus on upload area
+    // Focus on prompt input
     promptInput.focus();
 }
 
 /**
  * Set loading state
  */
-function setLoading(isLoading) {
-    generateBtn.disabled = isLoading;
-
+function setLoading(loading) {
     const btnText = generateBtn.querySelector('.btn-text');
     const btnLoader = generateBtn.querySelector('.btn-loader');
 
-    if (isLoading) {
+    if (loading) {
+        generateBtn.disabled = true;
         btnText.classList.add('hidden');
         btnLoader.classList.remove('hidden');
     } else {
         btnText.classList.remove('hidden');
         btnLoader.classList.add('hidden');
+        updateGenerateButton(); // Re-evaluate button state
     }
 }
 

@@ -14,6 +14,17 @@
     <!-- Stellar Mist Background -->
     <div class="background-mist"></div>
 
+    <!-- Fullscreen Image Modal -->
+    <div class="fullscreen-modal hidden" id="fullscreenModal">
+        <button class="fullscreen-close" id="fullscreenClose">
+            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="18" y1="6" x2="6" y2="18"/>
+                <line x1="6" y1="6" x2="18" y2="18"/>
+            </svg>
+        </button>
+        <img class="fullscreen-image" id="fullscreenImage" alt="Fullscreen preview">
+    </div>
+
     <!-- Main Container -->
     <div class="container">
         <!-- Header -->
@@ -37,13 +48,36 @@
                             <line x1="12" y1="3" x2="12" y2="15"/>
                         </svg>
                     </div>
-                    <p class="upload-text">Drop images here or <span class="upload-link">browse</span></p>
+                    <p class="upload-text">Drop images here</p>
                     <p class="upload-hint">Support: PNG, JPG, WEBP (Max 14 images)</p>
                     <input type="file" id="fileInput" multiple accept="image/*" hidden>
                 </div>
 
                 <!-- Image Preview Grid -->
                 <div class="preview-grid" id="previewGrid"></div>
+            </section>
+
+            <!-- Suggested Prompts Section -->
+            <section class="suggested-prompts-section">
+                <button class="prompts-toggle" id="promptsToggle">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+                    </svg>
+                    <span>Suggested Prompts</span>
+                    <svg class="toggle-arrow" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="6 9 12 15 18 9"/>
+                    </svg>
+                </button>
+                <div class="prompts-list hidden" id="promptsList">
+                    <button class="prompt-item" data-prompt="Faithfully restore this image with high fidelity to modern photograph quality, in full color, upscale to 4K.">
+                        <span class="prompt-title">Image Restoration</span>
+                        <span class="prompt-desc">Restore and upscale to 4K quality</span>
+                    </button>
+                    <button class="prompt-item" data-prompt="Create a dramatic cinematic portrait featuring the person (or people if more than 1) from the reference image (exactly according to the provided photo reference but with AI enhancements to match with the environment). The persons should maintain their natural hair texture, length, and style from the reference photo, with intense warm golden-orange backlighting as the primary light source, creating a luminous halo effect that illuminates her hair and creates beautiful texture definition. The backlighting should work with whatever hair type she has – whether straight, wavy, curly, short, or long – making it glow brilliantly against the dark background. Use a strong, saturated cool cyan-teal front light that heavily colors the face, neck, and shoulders with vibrant blue-green tones, creating dramatic orange-teal color contrast.">
+                        <span class="prompt-title">Cinematic Portrait</span>
+                        <span class="prompt-desc">Dramatic lighting with orange-teal contrast</span>
+                    </button>
+                </div>
             </section>
 
             <!-- Prompt Section -->
@@ -86,10 +120,23 @@
             <!-- Result Section -->
             <section class="result-section hidden" id="resultSection">
                 <h2 class="result-title">Generated Image</h2>
-                <div class="result-container">
+                <div class="result-container" id="resultContainer">
                     <img id="resultImage" class="result-image" alt="Generated image">
+                    <div class="result-overlay">
+                        <span>Click to view fullscreen</span>
+                    </div>
                 </div>
                 <div class="result-actions">
+                    <button id="shareBtn" class="action-btn share-btn">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="18" cy="5" r="3"/>
+                            <circle cx="6" cy="12" r="3"/>
+                            <circle cx="18" cy="19" r="3"/>
+                            <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/>
+                            <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
+                        </svg>
+                        Share
+                    </button>
                     <button id="downloadBtn" class="action-btn download-btn">
                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
@@ -121,7 +168,7 @@
 
         <!-- Footer -->
         <footer class="footer">
-            <p>Powered by Google Gemini AI</p>
+            <p>monkee - <span id="currentYear"></span></p>
         </footer>
     </div>
 
