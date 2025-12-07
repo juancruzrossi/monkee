@@ -217,7 +217,7 @@ async function handleGenerate() {
     // Disable button and show loading
     setLoading(true);
     hideError();
-    resultSection.hidden = true;
+    resultSection.classList.add('hidden');
 
     try {
         // Create form data
@@ -245,7 +245,7 @@ async function handleGenerate() {
         if (data.success && data.image) {
             // Show result
             resultImage.src = data.image;
-            resultSection.hidden = false;
+            resultSection.classList.remove('hidden');
 
             // Scroll to result
             setTimeout(() => {
@@ -292,7 +292,7 @@ function handleNewGeneration() {
     charCount.textContent = '0';
 
     // Hide result
-    resultSection.hidden = true;
+    resultSection.classList.add('hidden');
     resultImage.src = '';
 
     // Hide any errors
@@ -318,11 +318,11 @@ function setLoading(isLoading) {
     const btnLoader = generateBtn.querySelector('.btn-loader');
 
     if (isLoading) {
-        btnText.hidden = true;
-        btnLoader.hidden = false;
+        btnText.classList.add('hidden');
+        btnLoader.classList.remove('hidden');
     } else {
-        btnText.hidden = false;
-        btnLoader.hidden = true;
+        btnText.classList.remove('hidden');
+        btnLoader.classList.add('hidden');
     }
 }
 
@@ -331,7 +331,7 @@ function setLoading(isLoading) {
  */
 function showError(message) {
     errorText.textContent = message;
-    errorMessage.hidden = false;
+    errorMessage.classList.remove('hidden');
 
     // Scroll error into view
     setTimeout(() => {
@@ -343,6 +343,6 @@ function showError(message) {
  * Hide error message
  */
 function hideError() {
-    errorMessage.hidden = true;
+    errorMessage.classList.add('hidden');
     errorText.textContent = '';
 }
