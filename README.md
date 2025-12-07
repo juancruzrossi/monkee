@@ -44,15 +44,6 @@ python main.py
 
 Visit `http://localhost:8000` in your browser.
 
-## Deploy to Railway
-
-[![Deploy on Railway](https://railway.app/button.svg)](https://railway.app/template)
-
-1. Click "Deploy on Railway" or create a new project
-2. Connect your GitHub repository
-3. Add environment variable: `GOOGLE_API_KEY`
-4. Deploy
-
 ## Environment Variables
 
 | Variable | Description | Required |
@@ -64,8 +55,7 @@ Visit `http://localhost:8000` in your browser.
 
 - **Backend**: FastAPI, Python
 - **Frontend**: Vanilla JavaScript, CSS3
-- **AI**: Google Gemini API (gemini-2.0-flash-preview-image-generation)
-- **Deployment**: Railway
+- **AI**: Google Gemini API (gemini-3-pro-image-preview)
 
 ## API Reference
 

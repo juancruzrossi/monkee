@@ -35,22 +35,8 @@ client = None
 if GOOGLE_API_KEY:
     client = genai.Client(api_key=GOOGLE_API_KEY)
 
-# Available models for image generation
-MODELS = {
-    "gemini-2.0-flash-preview-image-generation": {
-        "name": "Gemini 2.0 Flash (Preview)",
-        "max_images": 3,
-        "supports_output": True
-    },
-    "imagen-3.0-generate-002": {
-        "name": "Imagen 3",
-        "max_images": 4,
-        "supports_output": True
-    }
-}
-
-# Default model
-DEFAULT_MODEL = "gemini-2.0-flash-preview-image-generation"
+# Default model - Gemini 3 Pro Image Preview (up to 4K resolution)
+DEFAULT_MODEL = "gemini-3-pro-image-preview"
 
 
 def process_image(image_data: bytes, max_size: int = 1024) -> Image.Image:
@@ -149,10 +135,10 @@ async def generate_image(
         for img in processed_images:
             contents.append(img)
 
-        # Try with Gemini model first (supports image input/output)
+        # Use Gemini 3 Pro Image Preview (supports image input/output, up to 4K)
         try:
             response = client.models.generate_content(
-                model="gemini-2.0-flash-preview-image-generation",
+                model="gemini-3-pro-image-preview",
                 contents=contents,
                 config=types.GenerateContentConfig(
                     response_modalities=["IMAGE", "TEXT"],
@@ -180,7 +166,7 @@ async def generate_image(
                     "success": True,
                     "image": f"data:image/png;base64,{img_base64}",
                     "message": response_text or "Image generated successfully!",
-                    "model_used": "gemini-2.0-flash-preview-image-generation"
+                    "model_used": "gemini-3-pro-image-preview"
                 })
             else:
                 # No image in response, try with Imagen 3
