@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Monkee - AI Image Generation</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/styles.css">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🐵</text></svg>">
+</head>
+<body>
+    <!-- Stellar Mist Background -->
+    <div class="background-mist"></div>
+
+    <!-- Main Container -->
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="logo">
+                <span class="logo-icon">🐵</span>
+                <h1>monkee</h1>
+            </div>
+            <p class="tagline">AI-Powered Image Generation</p>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Upload Section -->
+            <section class="upload-section">
+                <div class="upload-area" id="uploadArea">
+                    <div class="upload-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                            <polyline points="17 8 12 3 7 8"/>
+                            <line x1="12" y1="3" x2="12" y2="15"/>
+                        </svg>
+                    </div>
+                    <p class="upload-text">Drop images here or <span class="upload-link">browse</span></p>
+                    <p class="upload-hint">Support: PNG, JPG, WEBP (Max 14 images)</p>
+                    <input type="file" id="fileInput" multiple accept="image/*" hidden>
+                </div>
+
+                <!-- Image Preview Grid -->
+                <div class="preview-grid" id="previewGrid"></div>
+            </section>
+
+            <!-- Prompt Section -->
+            <section class="prompt-section">
+                <label for="promptInput" class="prompt-label">Describe your image</label>
+                <textarea
+                    id="promptInput"
+                    class="prompt-input"
+                    placeholder="A serene mountain landscape at golden hour, with misty valleys and a winding river reflecting the warm sunset colors..."
+                    rows="4"
+                ></textarea>
+                <div class="char-count"><span id="charCount">0</span> characters</div>
+            </section>
+
+            <!-- Options Section -->
+            <section class="options-section">
+                <div class="option-group">
+                    <label for="aspectRatio" class="option-label">Aspect Ratio</label>
+                    <select id="aspectRatio" class="option-select">
+                        <option value="1:1">Square (1:1)</option>
+                        <option value="16:9">Landscape (16:9)</option>
+                        <option value="9:16">Portrait (9:16)</option>
+                        <option value="4:3">Standard (4:3)</option>
+                        <option value="3:4">Portrait (3:4)</option>
+                    </select>
+                </div>
+            </section>
+
+            <!-- Generate Button -->
+            <button id="generateBtn" class="generate-btn" disabled>
+                <span class="btn-text">Generate Image</span>
+                <span class="btn-loader" hidden>
+                    <svg class="spinner" viewBox="0 0 24 24">
+                        <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="3" fill="none" stroke-dasharray="31.4" stroke-dashoffset="10"/>
+                    </svg>
+                    Generating...
+                </span>
+            </button>
+
+            <!-- Result Section -->
+            <section class="result-section" id="resultSection" hidden>
+                <h2 class="result-title">Generated Image</h2>
+                <div class="result-container">
+                    <img id="resultImage" class="result-image" alt="Generated image">
+                </div>
+                <div class="result-actions">
+                    <button id="downloadBtn" class="action-btn download-btn">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                            <polyline points="7 10 12 15 17 10"/>
+                            <line x1="12" y1="15" x2="12" y2="3"/>
+                        </svg>
+                        Download
+                    </button>
+                    <button id="newGenerationBtn" class="action-btn new-btn">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="23 4 23 10 17 10"/>
+                            <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/>
+                        </svg>
+                        New Generation
+                    </button>
+                </div>
+            </section>
+
+            <!-- Error Section -->
+            <div class="error-message" id="errorMessage" hidden>
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10"/>
+                    <line x1="12" y1="8" x2="12" y2="12"/>
+                    <line x1="12" y1="16" x2="12.01" y2="16"/>
+                </svg>
+                <span id="errorText"></span>
+            </div>
+        </main>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <p>Powered by Google Gemini AI</p>
+        </footer>
+    </div>
+
+    <script src="/static/app.js"></script>
+</body>
+</html>
