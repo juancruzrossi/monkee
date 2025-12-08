@@ -402,18 +402,34 @@ async function handleShare() {
 /**
  * Handle download button click
  */
-function handleDownload() {
+async function handleDownload() {
     const imageSrc = resultImage.src;
 
     if (!imageSrc) return;
 
-    // Create download link
-    const link = document.createElement('a');
-    link.href = imageSrc;
-    link.download = `monkee-${Date.now()}.png`;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+    try {
+        // Convert base64 data URL to Blob for better browser compatibility
+        const response = await fetch(imageSrc);
+        const blob = await response.blob();
+
+        // Create object URL from blob
+        const blobUrl = URL.createObjectURL(blob);
+
+        // Create download link
+        const link = document.createElement('a');
+        link.href = blobUrl;
+        link.download = `monkee-${Date.now()}.png`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+
+        // Clean up the object URL
+        setTimeout(() => URL.revokeObjectURL(blobUrl), 100);
+    } catch (error) {
+        console.error('Download error:', error);
+        // Fallback: open image in new tab
+        window.open(imageSrc, '_blank');
+    }
 }
 
 /**

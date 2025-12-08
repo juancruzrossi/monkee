@@ -13,7 +13,7 @@ from dotenv import load_dotenv
 from fastapi import FastAPI, File, Form, UploadFile, HTTPException
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse, JSONResponse
-from PIL import Image
+from PIL import Image, ImageOps
 from google import genai
 from google.genai import types
 
@@ -42,6 +42,12 @@ DEFAULT_MODEL = "gemini-3-pro-image-preview"
 def process_image(image_data: bytes, max_size: int = 1024) -> Image.Image:
     """Process and resize image if needed."""
     img = Image.open(BytesIO(image_data))
+
+    # Fix EXIF orientation (common issue with mobile photos)
+    try:
+        img = ImageOps.exif_transpose(img)
+    except Exception:
+        pass  # If EXIF transpose fails, continue with original
 
     # Convert to RGB if necessary (handles RGBA, P mode, etc.)
     if img.mode in ('RGBA', 'P', 'LA'):
