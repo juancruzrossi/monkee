@@ -227,26 +227,25 @@ function createPreviewItem(file, index) {
         item.innerHTML = `
             <img src="${imageSrc}" alt="Preview ${index + 1}">
             <button class="preview-remove" title="Remove image">
-                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <line x1="18" y1="6" x2="6" y2="18"/>
                     <line x1="6" y1="6" x2="18" y2="18"/>
                 </svg>
             </button>
         `;
 
-        // Remove button - must be set up FIRST
-        const removeBtn = item.querySelector('.preview-remove');
-        removeBtn.addEventListener('click', (e) => {
+        // Click anywhere on item to view fullscreen (except remove button)
+        item.addEventListener('click', (e) => {
+            if (!e.target.closest('.preview-remove')) {
+                openFullscreen(imageSrc);
+            }
+        });
+
+        // Remove button
+        item.querySelector('.preview-remove').addEventListener('click', (e) => {
             e.preventDefault();
             e.stopPropagation();
             removeFile(index);
-        });
-
-        // Click on image (not on remove button) to view fullscreen
-        const img = item.querySelector('img');
-        img.addEventListener('click', (e) => {
-            e.stopPropagation();
-            openFullscreen(imageSrc);
         });
 
         previewGrid.appendChild(item);
