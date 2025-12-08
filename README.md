@@ -49,7 +49,6 @@ Visit `http://localhost:8000` in your browser.
 | Variable | Description | Required |
 |----------|-------------|----------|
 | `GOOGLE_API_KEY` | Your Google Gemini API key | Yes |
-| `PORT` | Server port (default: 8000) | No |
 
 ## Tech Stack
 
